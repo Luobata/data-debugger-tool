@@ -1,8 +1,9 @@
-import path from 'path';
-import webpack from 'webpack';
-import vueLoaderConfig from './vue-loader.conf.js';
+const path = require('path');
+const webpack = require('webpack');
+const vueLoaderConfig = require('./vue-loader.conf.js');
+const assetsSubDirectory = 'static/';
 
-export default {
+module.exports = {
     entry: {
         background: './src/background',
     },
@@ -27,7 +28,7 @@ export default {
             {
                 test: /\.vue$/,
                 loader: 'vue-loader',
-                options: vueLoaderConfig(),
+                options: vueLoaderConfig,
             },
             {
                 test: /\.js$/,
@@ -41,7 +42,7 @@ export default {
                 loader: 'url-loader',
                 options: {
                     limit: 10000,
-                    name: utils.assetsPath('img/[name].[hash:7].[ext]'),
+                    name: assetsSubDirectory + 'img/[name].[hash:7].[ext]',
                 },
             },
         ],
