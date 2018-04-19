@@ -1,14 +1,24 @@
 const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack');
 const vueLoaderConfig = require('./vue-loader.conf.js');
 const assetsSubDirectory = 'static/';
 
+const getEntry = () => {
+    const base = path.resolve(__dirname, '../src');
+    const baseDir = fs.readdirSync(base);
+    const result = {};
+    for (let i of baseDir) {
+        const name = path.parse(i).name;
+        result[name] = `${base}/${name}`;
+    }
+    return result;
+};
+
 module.exports = {
-    entry: {
-        background: './src/background',
-    },
+    entry: getEntry(),
     output: {
-        path: path.join(__dirname, '/dev-tools/build'),
+        path: path.join(__dirname, '../dev-tools/build'),
         filename: '[name].js',
     },
     resolve: {
