@@ -60,30 +60,34 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 2:
+/***/ 5:
 /***/ (function(module, exports) {
 
-// DevTools page -- devtools.js
-// Create a connection to the background page
-var backgroundPageConnection = chrome.runtime.connect({
-    name: 'devtools-page'
-});
-console.log(2);
+var created = false;
+var timer = window.setTimeout(create, 1000);
 
-backgroundPageConnection.onMessage.addListener(function (message) {
-    // Handle responses from the background page, if any
-});
+var create = function create() {
+    if (created) return;
 
-// Relay the tab ID to the background page
-chrome.runtime.sendMessage({
-    tabId: chrome.devtools.inspectedWindow.tabId,
-    scriptToInject: 'panel.js'
-});
+    chrome.devtools.inspectedWindow.eval('!!(true)', function (hasVue) {
+        if (!hasVue) return;
+        window.clearTimeout(timer);
+        created = true;
+        chrome.devtools.panels.create('Data-debugger', 'images/back.jpg', 'devtools.html', function () {
+            // panel loaded
+        });
+    });
+};
+
+console.log(chrome, chrome.devtools);
+chrome.devtools.network.onNavigated.addListener(create);
+
+create();
 
 /***/ })
 
