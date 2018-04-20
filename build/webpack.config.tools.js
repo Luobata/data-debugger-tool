@@ -5,7 +5,7 @@ const vueLoaderConfig = require('./vue-loader.conf.js');
 const assetsSubDirectory = 'static/';
 
 const getEntry = () => {
-    const base = path.resolve(__dirname, '../src');
+    const base = path.resolve(__dirname, '../src/entry');
     const baseDir = fs.readdirSync(base);
     const result = {};
     for (let i of baseDir) {

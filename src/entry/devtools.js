@@ -3,7 +3,6 @@
 var backgroundPageConnection = chrome.runtime.connect({
     name: 'devtools-page',
 });
-console.log(2);
 
 backgroundPageConnection.onMessage.addListener(function(message) {
     // Handle responses from the background page, if any
