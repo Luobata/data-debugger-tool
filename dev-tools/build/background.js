@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */,
-/* 1 */
+/******/ ({
+
+/***/ 11:
 /***/ (function(module, exports) {
 
 chrome.runtime.onConnect.addListener(function (devToolsConnection) {
@@ -85,4 +85,5 @@ chrome.runtime.onConnect.addListener(function (devToolsConnection) {
 });
 
 /***/ })
-/******/ ]);
+
+/******/ });

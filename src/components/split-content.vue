@@ -7,7 +7,7 @@
     )
     .left(:style="{'width': split + '%'}")
         slot(name="left")
-            .dragger(@mousedown.prevent="start")
+        .dragger(@mousedown.prevent="start")
     .right(:style="{'width': (100 - split) + '%'}")
         slot(name="right")
 </template>

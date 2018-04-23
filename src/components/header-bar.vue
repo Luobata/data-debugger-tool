@@ -18,7 +18,7 @@
     vertical-align middle
 .refresh-icon
     font 14px 'microsoft yahei'
-    background #60A3F5
+    background blue
     color #fff
     height button-height
     line-height button-height
