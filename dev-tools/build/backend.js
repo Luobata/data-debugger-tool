@@ -75,7 +75,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 var getData = function getData(e) {
     if (e.data.source === 'data-debugger' && e.data.data === 'init') {
-        console.log(112);
         window.removeEventListener('message', getData);
         var listenList = [];
         var bridge = new __WEBPACK_IMPORTED_MODULE_0__components_bridge__["a" /* default */]({
@@ -96,6 +95,11 @@ var getData = function getData(e) {
                     data: data
                 }, '*');
             }
+        });
+        bridge.on('close', function () {
+            listenList.map(function (v) {
+                window.removeEventListener('message', v);
+            });
         });
         bridge.on('flush', function (data) {
             bridge.send('flush', window.test);

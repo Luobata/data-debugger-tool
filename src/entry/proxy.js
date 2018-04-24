@@ -20,3 +20,7 @@ const bridgeTobackend = data => {
 port.onMessage.addListener(bridgeTobackend);
 window.addEventListener('message', bridgeTotools);
 bridgeTobackend('init');
+port.onDisconnect.addListener(() => {
+    window.removeListener('message', bridgeTotools);
+    bridgeTobackend('close');
+});

@@ -2,7 +2,6 @@ import Bridge from '../components/bridge';
 
 const getData = e => {
     if (e.data.source === 'data-debugger' && e.data.data === 'init') {
-        console.log(112);
         window.removeEventListener('message', getData);
         const listenList = [];
         const bridge = new Bridge({
@@ -26,6 +25,11 @@ const getData = e => {
                     '*',
                 );
             },
+        });
+        bridge.on('close', () => {
+            listenList.map(v => {
+                window.removeEventListener('message', v);
+            });
         });
         bridge.on('flush', data => {
             bridge.send('flush', window.test);
