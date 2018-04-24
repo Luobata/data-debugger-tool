@@ -60,44 +60,138 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 12);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 12:
+/***/ 14:
 /***/ (function(module, exports) {
 
-chrome.runtime.onConnect.addListener(function (devToolsConnection) {
-    // assign the listener function to a variable so we can remove it later
-    var devToolsListener = function devToolsListener(message, sender, sendResponse) {
-        // Inject a content script into the identified tab
-        chrome.tabs.executeScript(message.tabId, {
-            file: message.scriptToInject
-        });
-    };
-    // add the listener
-    devToolsConnection.onMessage.addListener(devToolsListener);
+// 转发两个bridge
+// chrome.runtime.onConnect.addListener(devToolsConnection => {
+//     console.log(devToolsConnection);
+//     // assign the listener function to a variable so we can remove it later
+//     var devToolsListener = function(message, sender, sendResponse) {
+//         // Inject a content script into the identified tab
+//         chrome.tabs.executeScript(message.tabId, {
+//             file: message.scriptToInject,
+//         });
+//     };
+//     // add the listener
+//     devToolsConnection.onMessage.addListener(devToolsListener);
+//
+//     devToolsConnection.onDisconnect.addListener(function() {
+//         devToolsConnection.onMessage.removeListener(devToolsListener);
+//     });
+//     chrome.tabs.executeScript(
+//         tabId,
+//         {
+//             file: '/build/proxy.js',
+//         },
+//         function(res) {
+//             debugger;
+//             if (!res) {
+//                 // ports[tabId].devtools.postMessage('proxy-fail');
+//             } else {
+//                 console.log('injected proxy to tab ' + tabId);
+//             }
+//         },
+//     );
+// });
+// the background script runs all the time and serves as a central message
+// hub for each vue devtools (panel + proxy + backend) instance.
 
-    devToolsConnection.onDisconnect.addListener(function () {
-        devToolsConnection.onMessage.removeListener(devToolsListener);
-    });
-});
-var port = chrome.runtime.connect({
-    name: 'content-script'
-});
-var receive = function receive(request, sender, sendResponse) {
-    console.log(sender.tab ? 'from a content script:' + sender.tab.url : 'from the extension');
-    if (request.greeting == 'hello') sendResponse({ farewell: JSON.stringify({ farewell: 'goodbye' }) });
-};
-var devTools = function devTools(data) {
-    if (data.source === 'data-debugger') {
-        port.postMessage(data.data);
+var ports = {};
+
+chrome.runtime.onConnect.addListener(function (port) {
+    var tab = void 0;
+    var name = void 0;
+    if (isNumeric(port.name)) {
+        tab = port.name;
+        name = 'devtools';
+        installProxy(+port.name);
+    } else {
+        tab = port.sender.tab.id;
+        name = 'backend';
     }
-};
-port.onMessage.addListener(function (data) {});
-chrome.runtime.onMessage.addListener(receive);
-window.addEventListener('message', devTools);
+
+    if (!ports[tab]) {
+        ports[tab] = {
+            devtools: null,
+            backend: null
+        };
+    }
+    ports[tab][name] = port;
+
+    if (ports[tab].devtools && ports[tab].backend) {
+        doublePipe(tab, ports[tab].devtools, ports[tab].backend);
+    }
+});
+
+function isNumeric(str) {
+    return +str + '' === str;
+}
+
+function installProxy(tabId) {
+    chrome.tabs.executeScript(tabId, {
+        file: '/build/proxy.js'
+    }, function (res) {
+        debugger;
+        if (!res) {
+            ports[tabId].devtools.postMessage('proxy-fail');
+        } else {
+            console.log('injected proxy to tab ' + tabId);
+        }
+    });
+}
+
+function doublePipe(id, one, two) {
+    one.onMessage.addListener(lOne);
+    function lOne(message) {
+        if (message.event === 'log') {
+            return console.log('tab ' + id, message.payload);
+        }
+        console.log('devtools -> backend', message);
+        two.postMessage(message);
+    }
+    two.onMessage.addListener(lTwo);
+    function lTwo(message) {
+        if (message.event === 'log') {
+            return console.log('tab ' + id, message.payload);
+        }
+        console.log('backend -> devtools', message);
+        one.postMessage(message);
+    }
+    function shutdown() {
+        console.log('tab ' + id + ' disconnected.');
+        one.onMessage.removeListener(lOne);
+        two.onMessage.removeListener(lTwo);
+        one.disconnect();
+        two.disconnect();
+        ports[id] = null;
+    }
+    one.onDisconnect.addListener(shutdown);
+    two.onDisconnect.addListener(shutdown);
+    console.log('tab ' + id + ' connected.');
+}
+
+chrome.runtime.onMessage.addListener(function (req, sender) {
+    if (sender.tab && req.vueDetected) {
+        chrome.browserAction.setIcon({
+            tabId: sender.tab.id,
+            path: {
+                16: 'icons/16.png',
+                48: 'icons/48.png',
+                128: 'icons/128.png'
+            }
+        });
+        chrome.browserAction.setPopup({
+            tabId: sender.tab.id,
+            popup: req.devtoolsEnabled ? 'popups/enabled.html' : 'popups/disabled.html'
+        });
+    }
+});
 
 /***/ })
 

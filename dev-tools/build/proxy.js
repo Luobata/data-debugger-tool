@@ -60,30 +60,33 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 38);
+/******/ 	return __webpack_require__(__webpack_require__.s = 42);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 38:
+/***/ 42:
 /***/ (function(module, exports) {
 
-// DevTools page -- devtools.js
-// Create a connection to the background page
-var backgroundPageConnection = chrome.runtime.connect({
-    name: 'devtools-page'
+var port = chrome.runtime.connect({
+    name: 'content-script'
 });
-
-backgroundPageConnection.onMessage.addListener(function (message) {
-    // Handle responses from the background page, if any
-});
-
-// Relay the tab ID to the background page
-// chrome.runtime.sendMessage({
-//     tabId: chrome.devtools.inspectedWindow.tabId,
-//     scriptToInject: 'panel.js',
-// });
-console.log(111);
+var bridgeTotools = function bridgeTotools(e) {
+    if (e.data.source === 'data-debugger-backend') {
+        console.log(e.data.data);
+        port.postMessage(e.data.data);
+    }
+};
+var bridgeTobackend = function bridgeTobackend(data) {
+    console.log(data);
+    window.postMessage({
+        source: 'data-debugger',
+        data: data
+    }, '*');
+};
+port.onMessage.addListener(bridgeTobackend);
+window.addEventListener('message', bridgeTotools);
+bridgeTobackend('init');
 
 /***/ })
 

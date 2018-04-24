@@ -2,16 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import App from '../components/app.vue';
 import store from '../components/store';
-// Vue.config.productionTip = false;
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log(
-        sender.tab
-            ? 'from a content script:' + sender.tab.url
-            : 'from the extension',
-    );
-    if (request.greeting == 'hello') sendResponse({ farewell: 'goodbye' });
-});
+import Bridge from '../components/bridge';
 
 const init = fn => {
     new Vue({
@@ -38,16 +29,28 @@ const inject = (scriptName, fn) => {
     });
 };
 
-window.getData = () => {
-    chrome.runtime.sendMessage({ greeting: 'hello' }, function(response) {
-        console.log(response);
-    });
-};
-
 window.onload = () => {
     init(() => {
         inject(chrome.runtime.getURL('build/backend.js'), () => {
             console.log('backend injected');
+            const port = chrome.runtime.connect({
+                name: '' + chrome.devtools.inspectedWindow.tabId,
+            });
+            const bridge = new Bridge({
+                listen(fn) {
+                    port.onMessage.addListener(fn);
+                },
+                send(data) {
+                    port.postMessage(data);
+                },
+            });
+            bridge.on('flush', data => {
+                console.log(data);
+                store.commit('changeData', data);
+            });
+            window.getData = () => {
+                bridge.send('flush');
+            };
         });
     });
 };
