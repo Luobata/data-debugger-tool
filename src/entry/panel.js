@@ -19,7 +19,6 @@ const create = () => {
     });
 };
 
-console.log(chrome, chrome.devtools);
 chrome.devtools.network.onNavigated.addListener(create);
 
 create();

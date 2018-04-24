@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 11:
+/***/ 12:
 /***/ (function(module, exports) {
 
 chrome.runtime.onConnect.addListener(function (devToolsConnection) {
@@ -83,6 +83,21 @@ chrome.runtime.onConnect.addListener(function (devToolsConnection) {
         devToolsConnection.onMessage.removeListener(devToolsListener);
     });
 });
+var port = chrome.runtime.connect({
+    name: 'content-script'
+});
+port.onMessage.addListener(receive);
+var receive = function receive(request, sender, sendResponse) {
+    console.log(sender.tab ? 'from a content script:' + sender.tab.url : 'from the extension');
+    if (request.greeting == 'hello') sendResponse({ farewell: JSON.stringify({ farewell: 'goodbye' }) });
+};
+var devTools = function devTools(data) {
+    if (data.source === 'data-debugger') {
+        port.postMessage(data.data);
+    }
+};
+chrome.runtime.onMessage.addListener(receive);
+window.addEventListener('message', devTools);
 
 /***/ })
 

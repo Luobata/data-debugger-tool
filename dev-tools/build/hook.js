@@ -60,19 +60,21 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 30);
+/******/ 	return __webpack_require__(__webpack_require__.s = 37);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 30:
+/***/ 37:
 /***/ (function(module, exports) {
 
-console.log(1);
-window.postMessage({
-    greeting: 'hello there!',
-    source: 'my-devtools-extension'
-}, '*');
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    console.log(sender.tab ? 'from a content script:' + sender.tab.url : 'from the extension');
+    if (request.greeting == 'hello') sendResponse({ farewell: 'goodbye' });
+});
+window.onload = function () {
+    console.log(window);
+};
 
 /***/ })
 

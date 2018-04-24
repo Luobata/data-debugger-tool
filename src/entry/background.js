@@ -13,3 +13,23 @@ chrome.runtime.onConnect.addListener(function(devToolsConnection) {
         devToolsConnection.onMessage.removeListener(devToolsListener);
     });
 });
+const port = chrome.runtime.connect({
+    name: 'content-script',
+});
+port.onMessage.addListener(receive);
+const receive = function(request, sender, sendResponse) {
+    console.log(
+        sender.tab
+            ? 'from a content script:' + sender.tab.url
+            : 'from the extension',
+    );
+    if (request.greeting == 'hello')
+        sendResponse({ farewell: JSON.stringify({ farewell: 'goodbye' }) });
+};
+const devTools = data => {
+    if (data.source === 'data-debugger') {
+        port.postMessage(data.data);
+    }
+};
+chrome.runtime.onMessage.addListener(receive);
+window.addEventListener('message', devTools);

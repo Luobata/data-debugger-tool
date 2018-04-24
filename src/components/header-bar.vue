@@ -41,7 +41,9 @@ export default {
         };
     },
     methods: {
-        refreshData() {},
+        refreshData() {
+            window.getData();
+        },
     },
 };
 </script>
