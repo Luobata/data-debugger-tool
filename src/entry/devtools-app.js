@@ -36,12 +36,19 @@ window.onload = () => {
             const port = chrome.runtime.connect({
                 name: '' + chrome.devtools.inspectedWindow.tabId,
             });
+            let disconnected = false;
+            port.onDisconnect.addListener(() => {
+                console.log('disconnected');
+                disconnected = true;
+            });
             const bridge = new Bridge({
                 listen(fn) {
                     port.onMessage.addListener(fn);
                 },
                 send(data) {
-                    port.postMessage(data);
+                    if (!disconnected) {
+                        port.postMessage(data);
+                    }
                 },
             });
             bridge.on('flush', data => {

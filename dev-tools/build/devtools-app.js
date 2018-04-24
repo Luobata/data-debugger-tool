@@ -9673,12 +9673,19 @@ window.onload = function () {
             var port = chrome.runtime.connect({
                 name: '' + chrome.devtools.inspectedWindow.tabId
             });
+            var disconnected = false;
+            port.onDisconnect.addListener(function () {
+                console.log('disconnected');
+                disconnected = true;
+            });
             var bridge = new __WEBPACK_IMPORTED_MODULE_4__components_bridge__["a" /* default */]({
                 listen: function listen(fn) {
                     port.onMessage.addListener(fn);
                 },
                 send: function send(data) {
-                    port.postMessage(data);
+                    if (!disconnected) {
+                        port.postMessage(data);
+                    }
                 }
             });
             bridge.on('flush', function (data) {
