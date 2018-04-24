@@ -86,7 +86,6 @@ chrome.runtime.onConnect.addListener(function (devToolsConnection) {
 var port = chrome.runtime.connect({
     name: 'content-script'
 });
-port.onMessage.addListener(receive);
 var receive = function receive(request, sender, sendResponse) {
     console.log(sender.tab ? 'from a content script:' + sender.tab.url : 'from the extension');
     if (request.greeting == 'hello') sendResponse({ farewell: JSON.stringify({ farewell: 'goodbye' }) });
@@ -96,6 +95,7 @@ var devTools = function devTools(data) {
         port.postMessage(data.data);
     }
 };
+port.onMessage.addListener(function (data) {});
 chrome.runtime.onMessage.addListener(receive);
 window.addEventListener('message', devTools);
 

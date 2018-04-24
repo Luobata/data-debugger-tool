@@ -16,7 +16,6 @@ chrome.runtime.onConnect.addListener(function(devToolsConnection) {
 const port = chrome.runtime.connect({
     name: 'content-script',
 });
-port.onMessage.addListener(receive);
 const receive = function(request, sender, sendResponse) {
     console.log(
         sender.tab
@@ -31,5 +30,6 @@ const devTools = data => {
         port.postMessage(data.data);
     }
 };
+port.onMessage.addListener(function(data) {});
 chrome.runtime.onMessage.addListener(receive);
 window.addEventListener('message', devTools);

@@ -13,13 +13,29 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.greeting == 'hello') sendResponse({ farewell: 'goodbye' });
 });
 
-const init = () => {
+const init = fn => {
     new Vue({
         store,
         render(h) {
             return h(App);
         },
     }).$mount('#app');
+    fn && fn();
+};
+const inject = (scriptName, fn) => {
+    const src = `
+        var script = document.constructor.prototype.createElement.call(document, 'script');
+        script.src = "${scriptName}";
+        document.documentElement.appendChild(script);
+        script.parentNode.removeChild(script);
+  `;
+
+    chrome.devtools.inspectedWindow.eval(src, function(res, err) {
+        if (err) {
+            console.log(err);
+        }
+        fn && fn();
+    });
 };
 
 window.getData = () => {
@@ -29,5 +45,9 @@ window.getData = () => {
 };
 
 window.onload = () => {
-    init();
+    init(() => {
+        inject(chrome.runtime.getURL('build/backend.js'), () => {
+            console.log('backend injected');
+        });
+    });
 };

@@ -9297,13 +9297,24 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.greeting == 'hello') sendResponse({ farewell: 'goodbye' });
 });
 
-var init = function init() {
+var init = function init(fn) {
     new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
         store: __WEBPACK_IMPORTED_MODULE_3__components_store__["a" /* default */],
         render: function render(h) {
             return h(__WEBPACK_IMPORTED_MODULE_2__components_app_vue__["a" /* default */]);
         }
     }).$mount('#app');
+    fn && fn();
+};
+var inject = function inject(scriptName, fn) {
+    var src = '\n        var script = document.constructor.prototype.createElement.call(document, \'script\');\n        script.src = "' + scriptName + '";\n        document.documentElement.appendChild(script);\n        script.parentNode.removeChild(script);\n  ';
+
+    chrome.devtools.inspectedWindow.eval(src, function (res, err) {
+        if (err) {
+            console.log(err);
+        }
+        fn && fn();
+    });
 };
 
 window.getData = function () {
@@ -9313,7 +9324,11 @@ window.getData = function () {
 };
 
 window.onload = function () {
-    init();
+    init(function () {
+        inject(chrome.runtime.getURL('build/backend.js'), function () {
+            console.log('backend injected');
+        });
+    });
 };
 
 /***/ }),

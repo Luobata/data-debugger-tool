@@ -79,10 +79,11 @@ backgroundPageConnection.onMessage.addListener(function (message) {
 });
 
 // Relay the tab ID to the background page
-chrome.runtime.sendMessage({
-    tabId: chrome.devtools.inspectedWindow.tabId,
-    scriptToInject: 'panel.js'
-});
+// chrome.runtime.sendMessage({
+//     tabId: chrome.devtools.inspectedWindow.tabId,
+//     scriptToInject: 'panel.js',
+// });
+console.log(111);
 
 /***/ })
 
