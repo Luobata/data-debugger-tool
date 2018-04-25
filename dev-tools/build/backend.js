@@ -102,7 +102,9 @@ var getData = function getData(e) {
             });
         });
         bridge.on('flush', function (data) {
-            bridge.send('flush', window.test);
+            var item = JSON.parse(JSON.stringify(window.__Canvas_Screen_Data || []));
+            console.log(item);
+            bridge.send('flush', item);
         });
     }
 };

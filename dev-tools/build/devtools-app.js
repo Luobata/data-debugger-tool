@@ -10886,14 +10886,7 @@ __WEBPACK_IMPORTED_MODULE_1_vue__["a" /* default */].use(__WEBPACK_IMPORTED_MODU
 
 var store = new __WEBPACK_IMPORTED_MODULE_0_vuex__["a" /* default */].Store({
     state: {
-        data: [{
-            name: 'xxx',
-            value: 123,
-            obj: {
-                a: 2,
-                b: 3
-            }
-        }],
+        data: [],
         chooseData: {}
     },
     mutations: {

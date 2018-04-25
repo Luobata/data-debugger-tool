@@ -5,16 +5,7 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        data: [
-            {
-                name: 'xxx',
-                value: 123,
-                obj: {
-                    a: 2,
-                    b: 3,
-                },
-            },
-        ],
+        data: [],
         chooseData: {},
     },
     mutations: {
