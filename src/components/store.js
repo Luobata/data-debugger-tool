@@ -11,6 +11,13 @@ const store = new Vuex.Store({
     mutations: {
         changeData(state, data) {
             state.data = data;
+            if (state.chooseData) {
+                for (let i of data) {
+                    if (i.id === state.chooseData.id) {
+                        state.chooseData = i;
+                    }
+                }
+            }
         },
         chooseData(state, data) {
             state.chooseData = data;
