@@ -83,7 +83,6 @@ backgroundPageConnection.onMessage.addListener(function (message) {
 //     tabId: chrome.devtools.inspectedWindow.tabId,
 //     scriptToInject: 'panel.js',
 // });
-console.log(111);
 
 /***/ })
 

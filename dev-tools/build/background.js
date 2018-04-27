@@ -69,38 +69,7 @@
 /***/ (function(module, exports) {
 
 // 转发两个bridge
-// chrome.runtime.onConnect.addListener(devToolsConnection => {
-//     console.log(devToolsConnection);
-//     // assign the listener function to a variable so we can remove it later
-//     var devToolsListener = function(message, sender, sendResponse) {
-//         // Inject a content script into the identified tab
-//         chrome.tabs.executeScript(message.tabId, {
-//             file: message.scriptToInject,
-//         });
-//     };
-//     // add the listener
-//     devToolsConnection.onMessage.addListener(devToolsListener);
-//
-//     devToolsConnection.onDisconnect.addListener(function() {
-//         devToolsConnection.onMessage.removeListener(devToolsListener);
-//     });
-//     chrome.tabs.executeScript(
-//         tabId,
-//         {
-//             file: '/build/proxy.js',
-//         },
-//         function(res) {
-//             debugger;
-//             if (!res) {
-//                 // ports[tabId].devtools.postMessage('proxy-fail');
-//             } else {
-//                 console.log('injected proxy to tab ' + tabId);
-//             }
-//         },
-//     );
-// });
-// the background script runs all the time and serves as a central message
-// hub for each vue devtools (panel + proxy + backend) instance.
+// forked from vue-devtools
 
 var ports = {};
 
@@ -137,7 +106,6 @@ function installProxy(tabId) {
     chrome.tabs.executeScript(tabId, {
         file: '/build/proxy.js'
     }, function (res) {
-        debugger;
         if (!res) {
             ports[tabId].devtools.postMessage('proxy-fail');
         } else {

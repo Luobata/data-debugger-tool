@@ -100,6 +100,7 @@ var getData = function getData(e) {
             listenList.map(function (v) {
                 window.removeEventListener('message', v);
             });
+            bridge.send('flush', []);
         });
         bridge.on('flush', function (data) {
             var item = JSON.parse(JSON.stringify(window.__Canvas_Screen_Data || []));

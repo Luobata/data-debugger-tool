@@ -88,6 +88,7 @@ port.onMessage.addListener(bridgeTobackend);
 window.addEventListener('message', bridgeTotools);
 bridgeTobackend('init');
 port.onDisconnect.addListener(function () {
+    console.log('close');
     window.removeEventListener('message', bridgeTotools);
     bridgeTobackend('close');
 });

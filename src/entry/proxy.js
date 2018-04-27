@@ -21,6 +21,7 @@ port.onMessage.addListener(bridgeTobackend);
 window.addEventListener('message', bridgeTotools);
 bridgeTobackend('init');
 port.onDisconnect.addListener(() => {
+    console.log('close');
     window.removeEventListener('message', bridgeTotools);
     bridgeTobackend('close');
 });

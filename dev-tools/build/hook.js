@@ -68,7 +68,22 @@
 /***/ 39:
 /***/ (function(module, exports) {
 
+var installHook = function installHook(window) {
+    var hook = {
+        install: function install() {}
+    };
 
+    Object.defineProperty(window, '__DATA_DEBUGGER_DEVTOOLS_GLOBAL_HOOK__', {
+        get: function get() {
+            return hook;
+        }
+    });
+};
+
+var script = document.createElement('script');
+script.textContent = ';(' + installHook.toString() + ')(window)';
+document.documentElement.appendChild(script);
+script.parentNode.removeChild(script);
 
 /***/ })
 

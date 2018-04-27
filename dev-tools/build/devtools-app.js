@@ -9635,26 +9635,13 @@ function subFieldCount(value) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vuex__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_app_vue__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_store__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_bridge__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_bridge__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_main__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_store__ = __webpack_require__(37);
 
 
 
 
-
-
-var init = function init(fn) {
-    new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
-        store: __WEBPACK_IMPORTED_MODULE_3__components_store__["a" /* default */],
-        render: function render(h) {
-            return h(__WEBPACK_IMPORTED_MODULE_2__components_app_vue__["a" /* default */]);
-        }
-    }).$mount('#app');
-    fn && fn();
-};
 var inject = function inject(scriptName, fn) {
     var src = '\n        var script = document.constructor.prototype.createElement.call(document, \'script\');\n        script.src = "' + scriptName + '";\n        document.documentElement.appendChild(script);\n        script.parentNode.removeChild(script);\n  ';
 
@@ -9667,35 +9654,44 @@ var inject = function inject(scriptName, fn) {
 };
 
 window.onload = function () {
-    init(function () {
-        inject(chrome.runtime.getURL('build/backend.js'), function () {
-            console.log('backend injected');
-            var port = chrome.runtime.connect({
-                name: '' + chrome.devtools.inspectedWindow.tabId
-            });
-            var disconnected = false;
-            port.onDisconnect.addListener(function () {
-                console.log('disconnected');
-                disconnected = true;
-            });
-            var bridge = new __WEBPACK_IMPORTED_MODULE_4__components_bridge__["a" /* default */]({
-                listen: function listen(fn) {
-                    port.onMessage.addListener(fn);
-                },
-                send: function send(data) {
-                    if (!disconnected) {
-                        port.postMessage(data);
+    // export default () => {
+    var bridge = void 0;
+    var install = function install() {
+        Object(__WEBPACK_IMPORTED_MODULE_1__components_main__["a" /* default */])(function () {
+            inject(chrome.runtime.getURL('build/backend.js'), function () {
+                console.log('backend injected');
+                var port = chrome.runtime.connect({
+                    name: '' + chrome.devtools.inspectedWindow.tabId
+                });
+                var disconnected = false;
+                port.onDisconnect.addListener(function () {
+                    console.log('disconnected');
+                    disconnected = true;
+                });
+                bridge = new __WEBPACK_IMPORTED_MODULE_0__components_bridge__["a" /* default */]({
+                    listen: function listen(fn) {
+                        port.onMessage.addListener(fn);
+                    },
+                    send: function send(data) {
+                        if (!disconnected) {
+                            port.postMessage(data);
+                        }
                     }
-                }
+                });
+                bridge.on('flush', function (data) {
+                    console.log(data);
+                    __WEBPACK_IMPORTED_MODULE_2__components_store__["a" /* default */].commit('changeData', data);
+                });
+                window.getData = function () {
+                    bridge.send('flush');
+                };
             });
-            bridge.on('flush', function (data) {
-                console.log(data);
-                __WEBPACK_IMPORTED_MODULE_3__components_store__["a" /* default */].commit('changeData', data);
-            });
-            window.getData = function () {
-                bridge.send('flush');
-            };
         });
+    };
+    install();
+    chrome.devtools.network.onNavigated.addListener(function () {
+        bridge.removeAllListeners();
+        install();
     });
 };
 
@@ -10928,6 +10924,39 @@ var store = new __WEBPACK_IMPORTED_MODULE_0_vuex__["a" /* default */].Store({
 });
 
 /* harmony default export */ __webpack_exports__["a"] = (store);
+
+/***/ }),
+/* 38 */,
+/* 39 */,
+/* 40 */,
+/* 41 */,
+/* 42 */,
+/* 43 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vuex__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_vue__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__store__ = __webpack_require__(37);
+
+
+
+
+
+var app = null;
+var init = function init(fn) {
+    if (app) app.$destroy();
+    app = new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
+        store: __WEBPACK_IMPORTED_MODULE_3__store__["a" /* default */],
+        render: function render(h) {
+            return h(__WEBPACK_IMPORTED_MODULE_2__app_vue__["a" /* default */]);
+        }
+    }).$mount('#app');
+    fn && fn();
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (init);
 
 /***/ })
 /******/ ]);

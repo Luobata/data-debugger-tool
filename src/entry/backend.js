@@ -30,6 +30,7 @@ const getData = e => {
             listenList.map(v => {
                 window.removeEventListener('message', v);
             });
+            bridge.send('flush', []);
         });
         bridge.on('flush', data => {
             const item = JSON.parse(
