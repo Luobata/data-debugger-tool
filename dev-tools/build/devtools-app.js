@@ -10946,13 +10946,15 @@ var store = new __WEBPACK_IMPORTED_MODULE_0_vuex__["a" /* default */].Store({
 
 var app = null;
 var init = function init(fn) {
-    if (app) app.$destroy();
-    app = new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
-        store: __WEBPACK_IMPORTED_MODULE_3__store__["a" /* default */],
-        render: function render(h) {
-            return h(__WEBPACK_IMPORTED_MODULE_2__app_vue__["a" /* default */]);
-        }
-    }).$mount('#app');
+    if (!app) {
+        // app.$destroy();
+        app = new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
+            store: __WEBPACK_IMPORTED_MODULE_3__store__["a" /* default */],
+            render: function render(h) {
+                return h(__WEBPACK_IMPORTED_MODULE_2__app_vue__["a" /* default */]);
+            }
+        }).$mount('#app');
+    }
     fn && fn();
 };
 
