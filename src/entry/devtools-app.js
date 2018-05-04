@@ -50,6 +50,8 @@ window.onload = () => {
                 window.getData = () => {
                     bridge.send('flush');
                 };
+                store.commit('changeData', []);
+                store.commit('chooseData', {});
             });
         });
     };
