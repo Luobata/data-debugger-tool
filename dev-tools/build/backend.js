@@ -71,11 +71,14 @@
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_bridge__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__hook__ = __webpack_require__(40);
+
 
 
 var getData = function getData(e) {
     if (e.data.source === 'data-debugger' && e.data.data === 'init') {
         window.removeEventListener('message', getData);
+        var hook = window[__WEBPACK_IMPORTED_MODULE_1__hook__["hookName"]];
         var listenList = [];
         var bridge = new __WEBPACK_IMPORTED_MODULE_0__components_bridge__["a" /* default */]({
             listen: function listen(fn) {
@@ -95,6 +98,9 @@ var getData = function getData(e) {
                     data: data
                 }, '*');
             }
+        });
+        hook.on('refresh', function () {
+            console.log(1);
         });
         bridge.on('close', function () {
             listenList.map(function (v) {
@@ -465,6 +471,82 @@ function isObject(arg) {
 function isUndefined(arg) {
   return arg === void 0;
 }
+
+/***/ }),
+
+/***/ 40:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hookName", function() { return hookName; });
+var hookName = '__DATA_DEBUGGER_DEVTOOLS_GLOBAL_HOOK__';
+var installHook = function installHook(window, hookName) {
+    if (window[hookName]) {
+        return;
+    }
+    var listeners = {};
+    var hook = {
+        install: function install() {},
+        refresh: function refresh() {},
+        on: function on(event, fn) {
+            event = '$' + event;
+            (listeners[event] || (listeners[event] = [])).push(fn);
+        },
+        once: function once(event, fn) {
+            var eventAlias = event;
+            event = '$' + event;
+            function on() {
+                this.off(eventAlias, on);
+                fn.apply(this, arguments);
+            }
+            (listeners[event] || (listeners[event] = [])).push(on);
+        },
+        off: function off(event, fn) {
+            event = '$' + event;
+            if (!arguments.length) {
+                listeners = {};
+            } else {
+                var cbs = listeners[event];
+                if (cbs) {
+                    if (!fn) {
+                        listeners[event] = null;
+                    } else {
+                        for (var i = 0, l = cbs.length; i < l; i++) {
+                            var cb = cbs[i];
+                            if (cb === fn || cb.fn === fn) {
+                                cbs.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        emit: function emit(event) {
+            event = '$' + event;
+            var cbs = listeners[event];
+            if (cbs) {
+                var args = [].slice.call(arguments, 1);
+                cbs = cbs.slice();
+                for (var i = 0, l = cbs.length; i < l; i++) {
+                    cbs[i].apply(this, args);
+                }
+            }
+        }
+    };
+
+    Object.defineProperty(window, hookName, {
+        get: function get() {
+            return hook;
+        }
+    });
+};
+
+var script = document.createElement('script');
+script.textContent = ';(' + installHook.toString() + ')(window, "' + hookName + '")';
+document.documentElement.appendChild(script);
+script.parentNode.removeChild(script);
 
 /***/ })
 

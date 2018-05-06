@@ -1,8 +1,10 @@
 import Bridge from '../components/bridge';
+import { hookName } from './hook';
 
 const getData = e => {
     if (e.data.source === 'data-debugger' && e.data.data === 'init') {
         window.removeEventListener('message', getData);
+        const hook = window[hookName];
         const listenList = [];
         const bridge = new Bridge({
             listen(fn) {
@@ -25,6 +27,9 @@ const getData = e => {
                     '*',
                 );
             },
+        });
+        hook.on('refresh', () => {
+            console.log(1);
         });
         bridge.on('close', () => {
             listenList.map(v => {
