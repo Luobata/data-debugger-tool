@@ -30,6 +30,7 @@ const getData = e => {
         });
         hook.on('refresh', () => {
             console.log(1);
+            bridge.emit('flush');
         });
         bridge.on('close', () => {
             listenList.map(v => {

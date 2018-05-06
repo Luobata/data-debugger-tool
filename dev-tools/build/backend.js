@@ -101,6 +101,7 @@ var getData = function getData(e) {
         });
         hook.on('refresh', function () {
             console.log(1);
+            bridge.emit('flush');
         });
         bridge.on('close', function () {
             listenList.map(function (v) {
