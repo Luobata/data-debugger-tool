@@ -60,12 +60,12 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 40);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 40:
+/***/ 5:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -78,7 +78,7 @@ var installHook = function installHook(window, hookName) {
     }
     var listeners = {};
     var hook = {
-        install: function install() {},
+        installed: false,
         refresh: function refresh() {},
         on: function on(event, fn) {
             event = '$' + event;
@@ -126,6 +126,9 @@ var installHook = function installHook(window, hookName) {
             }
         }
     };
+    hook.once('install', function () {
+        hook.installed = true;
+    });
 
     Object.defineProperty(window, hookName, {
         get: function get() {

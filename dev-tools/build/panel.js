@@ -66,15 +66,21 @@
 /******/ ({
 
 /***/ 42:
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__hook__ = __webpack_require__(5);
 
 var created = false;
-var timer = window.setTimeout(create, 1000);
+var timer = window.setTimeout(function () {
+    create(__WEBPACK_IMPORTED_MODULE_0__hook__["hookName"]);
+}, 1000);
 
-var create = function create() {
+var create = function create(hookName) {
     if (created) return;
 
-    chrome.devtools.inspectedWindow.eval('!!(true)', function (hasVue) {
+    chrome.devtools.inspectedWindow.eval('!!(window.' + hookName + '.installed)', function (hasVue) {
         if (!hasVue) return;
         window.clearTimeout(timer);
         created = true;
@@ -84,9 +90,90 @@ var create = function create() {
     });
 };
 
-chrome.devtools.network.onNavigated.addListener(create);
+chrome.devtools.network.onNavigated.addListener(function () {
+    create(__WEBPACK_IMPORTED_MODULE_0__hook__["hookName"]);
+});
 
-create();
+create(__WEBPACK_IMPORTED_MODULE_0__hook__["hookName"]);
+
+/***/ }),
+
+/***/ 5:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hookName", function() { return hookName; });
+var hookName = '__DATA_DEBUGGER_DEVTOOLS_GLOBAL_HOOK__';
+var installHook = function installHook(window, hookName) {
+    if (window[hookName]) {
+        return;
+    }
+    var listeners = {};
+    var hook = {
+        installed: false,
+        refresh: function refresh() {},
+        on: function on(event, fn) {
+            event = '$' + event;
+            (listeners[event] || (listeners[event] = [])).push(fn);
+        },
+        once: function once(event, fn) {
+            var eventAlias = event;
+            event = '$' + event;
+            function on() {
+                this.off(eventAlias, on);
+                fn.apply(this, arguments);
+            }
+            (listeners[event] || (listeners[event] = [])).push(on);
+        },
+        off: function off(event, fn) {
+            event = '$' + event;
+            if (!arguments.length) {
+                listeners = {};
+            } else {
+                var cbs = listeners[event];
+                if (cbs) {
+                    if (!fn) {
+                        listeners[event] = null;
+                    } else {
+                        for (var i = 0, l = cbs.length; i < l; i++) {
+                            var cb = cbs[i];
+                            if (cb === fn || cb.fn === fn) {
+                                cbs.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        emit: function emit(event) {
+            event = '$' + event;
+            var cbs = listeners[event];
+            if (cbs) {
+                var args = [].slice.call(arguments, 1);
+                cbs = cbs.slice();
+                for (var i = 0, l = cbs.length; i < l; i++) {
+                    cbs[i].apply(this, args);
+                }
+            }
+        }
+    };
+    hook.once('install', function () {
+        hook.installed = true;
+    });
+
+    Object.defineProperty(window, hookName, {
+        get: function get() {
+            return hook;
+        }
+    });
+};
+
+var script = document.createElement('script');
+script.textContent = ';(' + installHook.toString() + ')(window, "' + hookName + '")';
+document.documentElement.appendChild(script);
+script.parentNode.removeChild(script);
 
 /***/ })
 

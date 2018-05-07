@@ -60,18 +60,18 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 14:
+/***/ 15:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_bridge__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__hook__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__hook__ = __webpack_require__(5);
 
 
 
@@ -100,7 +100,6 @@ var getData = function getData(e) {
             }
         });
         hook.on('refresh', function () {
-            console.log(1);
             bridge.emit('flush');
         });
         bridge.on('close', function () {
@@ -475,7 +474,7 @@ function isUndefined(arg) {
 
 /***/ }),
 
-/***/ 40:
+/***/ 5:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -488,7 +487,7 @@ var installHook = function installHook(window, hookName) {
     }
     var listeners = {};
     var hook = {
-        install: function install() {},
+        installed: false,
         refresh: function refresh() {},
         on: function on(event, fn) {
             event = '$' + event;
@@ -536,6 +535,9 @@ var installHook = function installHook(window, hookName) {
             }
         }
     };
+    hook.once('install', function () {
+        hook.installed = true;
+    });
 
     Object.defineProperty(window, hookName, {
         get: function get() {

@@ -5,7 +5,7 @@ const installHook = (window, hookName) => {
     }
     let listeners = {};
     const hook = {
-        install() {},
+        installed: false,
         refresh() {},
         on(event, fn) {
             event = '$' + event;
@@ -53,6 +53,9 @@ const installHook = (window, hookName) => {
             }
         },
     };
+    hook.once('install', () => {
+        hook.installed = true;
+    });
 
     Object.defineProperty(window, hookName, {
         get() {
